@@ -143,6 +143,7 @@ extern crate lazy_static;
 
 extern crate percent_encoding;
 extern crate regex;
+extern crate syn;
 extern crate toml;
 
 mod config;

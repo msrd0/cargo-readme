@@ -10,13 +10,19 @@ categories = ["development-tools::cargo-plugins"]
 license = "MIT OR Apache-2.0"
 
 [dependencies]
+anyhow = "1.0"
 clap = "2.32"
-toml = "0.5"
+lazy_static = "1.1"
+percent-encoding = "2.1"
 regex = "1.0"
 serde = "1.0"
 serde_derive = "1.0"
-percent-encoding = "2.1"
-lazy_static = "1.1"
+syn = { version = "1.0", features = ["full", "parsing"], default-features = false }
+toml = "0.5"
+
+# hacky: not using syn from the crates.io registry to avoid enabling the "proc-macro" feature
+#        through the serde_derive dependency
+#syn = { git = "https://github.com/dtolnay/syn", tag = "1.0.69", features = ["full"], default-features = false }
 
 [dev-dependencies]
 assert_cli = "0.6"
