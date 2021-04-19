@@ -9,16 +9,17 @@ mod template;
 /// Generates readme data from `source` file
 ///
 /// Optionally, a template can be used to render the output
-pub fn generate_readme<T: Read>(
+pub fn generate_readme<R: Read>(
     project_root: &Path,
-    source: &mut T,
-    template: Option<&mut T>,
+    crate_name: &str,
+    source: &mut R,
+    template: Option<&mut R>,
     add_title: bool,
     add_badges: bool,
     add_license: bool,
     indent_headings: bool,
 ) -> Result<String, String> {
-    let lines = extract::extract_docs(source).map_err(|e| format!("{}", e))?;
+    let lines = extract::extract_docs(source, crate_name).map_err(|e| format!("{}", e))?;
 
     let readme = process::process_docs(lines, indent_headings).join("\n");
 
@@ -36,7 +37,7 @@ pub fn generate_readme<T: Read>(
 }
 
 /// Load a template String from a file
-fn get_template_string<T: Read>(template: &mut T) -> Result<String, String> {
+fn get_template_string<R: Read>(template: &mut R) -> Result<String, String> {
     let mut template_string = String::new();
     if let Err(e) = template.read_to_string(&mut template_string) {
         return Err(format!("Error: {}", e));

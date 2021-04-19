@@ -1,7 +1,8 @@
 //! Generate README.md from doc comments.
 
 use clap::{crate_version, App, AppSettings, Arg, ArgMatches, SubCommand};
-use std::io::{self, Write};
+use std::fs::File;
+use std::io::{self, Read, Write};
 
 mod helper;
 
@@ -96,6 +97,22 @@ fn execute(m: &ArgMatches) -> Result<(), String> {
     // get project root
     let project_root = helper::get_project_root(m.value_of("ROOT"))?;
 
+    // read the Cargo.toml file
+    let mut cargo_toml_file = File::open(project_root.join("Cargo.toml"))
+        .map_err(|_| "Failed to open Cargo.toml file".to_owned())?;
+    let mut buf = String::new();
+    cargo_toml_file
+        .read_to_string(&mut buf)
+        .map_err(|_| "Failed to read Cargo.toml file".to_owned())?;
+    let cargo_toml: toml::Value =
+        toml::from_str(&buf).map_err(|_| "Syntax error in Cargo.toml file".to_owned())?;
+    let crate_name = cargo_toml
+        .get("package")
+        .and_then(|pkg| pkg.as_table())
+        .and_then(|pkg| pkg.get("name"))
+        .and_then(|name| name.as_str())
+        .ok_or_else(|| "Unable to find package name in Cargo.toml file".to_owned())?;
+
     // get source file
     let mut source = helper::get_source(&project_root, input)?;
 
@@ -112,6 +129,7 @@ fn execute(m: &ArgMatches) -> Result<(), String> {
     // generate output
     let readme = cargo_readme::generate_readme(
         &project_root,
+        crate_name,
         &mut source,
         template_file.as_mut(),
         add_title,
