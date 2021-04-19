@@ -2,6 +2,7 @@
 name = "cargo-readme"
 version = "3.2.0"
 authors = ["Livio Ribeiro <livioribeiro@outlook.com>"]
+edition = "2018"
 description = "A cargo subcommand to generate README.md content from doc comments"
 repository = "https://github.com/livioribeiro/cargo-readme"
 readme = "README.md"
@@ -15,8 +16,7 @@ clap = "2.32"
 lazy_static = "1.1"
 percent-encoding = "2.1"
 regex = "1.0"
-serde = "1.0"
-serde_derive = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 syn = { version = "1.0", features = ["full", "parsing"], default-features = false }
 toml = "0.5"
 

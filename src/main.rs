@@ -1,13 +1,7 @@
 //! Generate README.md from doc comments.
 
-#[macro_use]
-extern crate clap;
-
-extern crate cargo_readme;
-
+use clap::{crate_version, App, AppSettings, Arg, ArgMatches, SubCommand};
 use std::io::{self, Write};
-
-use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 mod helper;
 
@@ -78,14 +72,11 @@ fn main() {
         .get_matches();
 
     if let Some(m) = matches.subcommand_matches("readme") {
-        match execute(m) {
-            Err(e) => {
-                io::stderr()
-                    .write_fmt(format_args!("Error: {}\n", e))
-                    .expect("An error occurred while trying to show an error message");
-                std::process::exit(1);
-            }
-            _ => {}
+        if let Err(e) = execute(m) {
+            io::stderr()
+                .write_fmt(format_args!("Error: {}\n", e))
+                .expect("An error occurred while trying to show an error message");
+            std::process::exit(1);
         }
     }
 }

@@ -4,9 +4,9 @@
 //! - "```", "```no_run", "```ignore" and "```should_panic" are converted to "```rust"
 //! - markdown heading are indentend to be one level lower, so the crate name is at the top level
 
-use std::iter::{IntoIterator, Iterator};
-
+use lazy_static::lazy_static;
 use regex::Regex;
+use std::iter::{IntoIterator, Iterator};
 
 lazy_static! {
     // Is this code block rust?
@@ -38,7 +38,7 @@ impl Processor {
     pub fn new(indent_headings: bool) -> Self {
         Processor {
             section: Section::None,
-            indent_headings: indent_headings,
+            indent_headings,
             delimiter: None,
         }
     }
@@ -50,7 +50,7 @@ impl Processor {
         }
 
         // indent heading when outside code
-        if self.indent_headings && self.section == Section::None && line.trim().starts_with("#") {
+        if self.indent_headings && self.section == Section::None && line.trim().starts_with('#') {
             while line
                 .chars()
                 .next()
@@ -76,7 +76,7 @@ impl Processor {
             }
         } else if self.section != Section::None && Some(&line) == self.delimiter.as_ref() {
             self.section = Section::None;
-            line = self.delimiter.take().unwrap_or("```".to_owned());
+            line = self.delimiter.take().unwrap_or_else(|| "```".to_owned());
         }
 
         Some(line)

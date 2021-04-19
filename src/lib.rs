@@ -136,19 +136,8 @@
 //! By default, `README.tpl` will be used as the template, but you can override it using the
 //! `--template` to choose a different template or `--no-template` to disable it.
 
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate lazy_static;
-
-extern crate percent_encoding;
-extern crate regex;
-extern crate syn;
-extern crate toml;
-
 mod config;
 mod readme;
 
-pub use config::get_manifest;
-pub use config::project;
+pub use config::{get_manifest, project};
 pub use readme::generate_readme;

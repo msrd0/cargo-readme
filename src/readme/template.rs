@@ -1,4 +1,4 @@
-use config::Manifest;
+use crate::config::Manifest;
 
 /// Renders the template
 ///
@@ -23,7 +23,7 @@ pub fn render(
     if let Some(template) = template {
         process_template(template, readme, title, badges, license, version)
     } else {
-        process_string(
+        Ok(process_string(
             readme,
             title,
             badges,
@@ -31,7 +31,7 @@ pub fn render(
             add_title,
             add_badges,
             add_license,
-        )
+        ))
     }
 }
 
@@ -51,7 +51,7 @@ fn process_template(
     license: Option<&str>,
     version: &str,
 ) -> Result<String, String> {
-    template = template.trim_end_matches("\n").to_owned();
+    template = template.trim_end_matches('\n').to_owned();
 
     if !template.contains("{{readme}}") {
         return Err("Missing `{{readme}}` in template".to_owned());
@@ -96,7 +96,7 @@ fn process_string(
     add_title: bool,
     add_badges: bool,
     add_license: bool,
-) -> Result<String, String> {
+) -> String {
     if add_title {
         readme = prepend_title(readme, title);
     }
@@ -111,12 +111,12 @@ fn process_string(
         }
     }
 
-    Ok(readme)
+    readme
 }
 
 /// Prepend badges to output string
 fn prepend_badges(readme: String, badges: &[&str]) -> String {
-    if badges.len() > 0 {
+    if !badges.is_empty() {
         let badges = badges.join("\n");
         if !readme.is_empty() {
             format!("{}\n\n{}", badges, readme)
@@ -291,16 +291,14 @@ mod tests {
     #[test]
     fn render_minimal() {
         let result = super::process_string("readme".to_owned(), "", &[], None, false, false, false);
-        assert!(result.is_ok());
-        assert_eq!("readme", result.unwrap());
+        assert_eq!("readme", result);
     }
 
     #[test]
     fn render_title() {
         let result =
             super::process_string("readme".to_owned(), "title", &[], None, true, false, false);
-        assert!(result.is_ok());
-        assert_eq!("# title\n\nreadme", result.unwrap());
+        assert_eq!("# title\n\nreadme", result);
     }
 
     #[test]
@@ -314,8 +312,7 @@ mod tests {
             true,
             false,
         );
-        assert!(result.is_ok());
-        assert_eq!("badge1\nbadge2\n\nreadme", result.unwrap());
+        assert_eq!("badge1\nbadge2\n\nreadme", result);
     }
 
     #[test]
@@ -329,8 +326,7 @@ mod tests {
             false,
             true,
         );
-        assert!(result.is_ok());
-        assert_eq!("readme\n\nLicense: license", result.unwrap());
+        assert_eq!("readme\n\nLicense: license", result);
     }
 
     #[test]
@@ -344,10 +340,9 @@ mod tests {
             true,
             true,
         );
-        assert!(result.is_ok());
         assert_eq!(
             "badge1\nbadge2\n\n# title\n\nreadme\n\nLicense: license",
-            result.unwrap()
+            result
         );
     }
 
@@ -362,8 +357,7 @@ mod tests {
             false,
             false,
         );
-        assert!(result.is_ok());
-        assert_eq!("readme", result.unwrap());
+        assert_eq!("readme", result);
     }
 
     // prepend badges

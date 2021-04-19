@@ -27,7 +27,7 @@ fn parse_doc_attr(input: &Attribute) -> syn::Result<Option<LitStr>> {
         Ok(match meta {
             Meta::NameValue(kv) => Some(match kv.lit {
                 Lit::Str(str) => str,
-                lit => return Err(syn::Error::new(lit.span(), "Expected string literal").into()),
+                lit => return Err(syn::Error::new(lit.span(), "Expected string literal")),
             }),
             _ => None,
         })
